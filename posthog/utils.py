@@ -516,7 +516,6 @@ def get_ip_address(request: HttpRequest) -> str:
 
 
 def dict_from_cursor_fetchall(cursor):
-    columns = [col[0] for col in cursor.description]
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
@@ -552,7 +551,7 @@ def get_compare_period_dates(
             interval == "day"
             and date_from_delta_mapping
             and date_from_delta_mapping.get("days", None)
-            and date_from_delta_mapping["days"] % 7 == 0
+            and date_from_delta_mapping["days"] == 0
             and not date_to_delta_mapping
         ):
             # KLUDGE: Unfortunately common relative date ranges such as "Last 7 days" (-7d) or "Last 14 days" (-14d)
@@ -705,12 +704,12 @@ def get_table_size(table_name) -> str:
     from django.db import connection
 
     query = (
-        f'SELECT pg_size_pretty(pg_total_relation_size(relid)) AS "size" '
-        f"FROM pg_catalog.pg_statio_user_tables "
-        f"WHERE relname = '{table_name}'"
+        'SELECT pg_size_pretty(pg_total_relation_size(relid)) AS "size" '
+        "FROM pg_catalog.pg_statio_user_tables "
+        "WHERE relname = ?"
     )
     cursor = connection.cursor()
-    cursor.execute(query)
+    cursor.execute(query, (table_name, ))
     return dict_from_cursor_fetchall(cursor)[0]["size"]
 
 
@@ -921,7 +920,7 @@ def get_daterange(
         start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
         end_date = end_date.replace(hour=0, minute=0, second=0, microsecond=0)
     if frequency == "week":
-        start_date -= datetime.timedelta(days=(start_date.weekday() + 1) % 7)
+        start_date -= datetime.timedelta(days=(start_date.weekday() + 1))
     if frequency != "month":
         while start_date <= end_date:
             time_range.append(start_date)

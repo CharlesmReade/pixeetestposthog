@@ -2,11 +2,10 @@
 
 import urllib.parse
 from typing import Iterator, Dict, Any, List, Optional
-
-from dlt.sources.helpers import requests
 import requests as http_requests
 from .settings import OBJECT_TYPE_PLURAL
 from .auth import refresh_access_token
+from security import safe_requests
 
 BASE_URL = "https://api.hubapi.com/"
 
@@ -70,7 +69,7 @@ def fetch_property_history(
     params["propertiesWithHistory"] = props
     params["limit"] = 50
     # Make the API request
-    r = requests.get(url, headers=headers, params=params)
+    r = safe_requests.get(url, headers=headers, params=params)
     # Parse the API response and yield the properties of each result
 
     # Parse the response JSON data
@@ -84,7 +83,7 @@ def fetch_property_history(
         if _next:
             next_url = _next["link"]
             # Get the next page response
-            r = requests.get(next_url, headers=headers)
+            r = safe_requests.get(next_url, headers=headers)
             _data = r.json()
         else:
             _data = None
@@ -125,13 +124,13 @@ def fetch_data(
 
     # Make the API request
     try:
-        r = requests.get(url, headers=headers, params=params)
+        r = safe_requests.get(url, headers=headers, params=params)
     except http_requests.exceptions.HTTPError as e:
         if e.response.status_code == 401:
             # refresh token
             api_key = refresh_access_token(refresh_token)
             headers = _get_headers(api_key)
-            r = requests.get(url, headers=headers, params=params)
+            r = safe_requests.get(url, headers=headers, params=params)
         else:
             raise e
     # Parse the API response and yield the properties of each result
@@ -170,7 +169,7 @@ def fetch_data(
         if _next:
             next_url = _next["link"]
             # Get the next page response
-            r = requests.get(next_url, headers=headers)
+            r = safe_requests.get(next_url, headers=headers)
             _data = r.json()
         else:
             _data = None

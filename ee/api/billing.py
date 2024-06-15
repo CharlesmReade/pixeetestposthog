@@ -1,7 +1,6 @@
 from typing import Any, Optional
 
 import posthoganalytics
-import requests
 import structlog
 from django.conf import settings
 from django.http import HttpResponse
@@ -18,6 +17,7 @@ from ee.settings import BILLING_SERVICE_URL
 from posthog.api.routing import TeamAndOrgViewSetMixin
 from posthog.cloud_utils import get_cached_instance_license
 from posthog.models import Organization
+from security import safe_requests
 
 logger = structlog.get_logger(__name__)
 
@@ -142,8 +142,7 @@ class BillingViewset(TeamAndOrgViewSetMixin, viewsets.GenericViewSet):
 
         license = License(key=serializer.validated_data["license"])
 
-        res = requests.get(
-            f"{BILLING_SERVICE_URL}/api/billing",
+        res = safe_requests.get(f"{BILLING_SERVICE_URL}/api/billing",
             headers=BillingManager(license).get_auth_headers(organization),
         )
 

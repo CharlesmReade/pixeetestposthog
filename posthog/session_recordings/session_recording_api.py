@@ -8,7 +8,6 @@ from typing import Any, List, Type, cast, Dict, Tuple
 from django.conf import settings
 
 import posthoganalytics
-import requests
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.http import JsonResponse, HttpResponse
@@ -55,6 +54,7 @@ from posthog.session_recordings.snapshots.convert_legacy_snapshots import (
 )
 from posthog.storage import object_storage
 from prometheus_client import Counter
+from security import safe_requests
 
 
 SNAPSHOT_SOURCE_REQUESTED = Counter(
@@ -415,7 +415,7 @@ class SessionRecordingViewSet(TeamAndOrgViewSetMixin, viewsets.GenericViewSet):
 
         elif source == "realtime":
             if request.GET.get("version", None) == "3" and settings.RECORDINGS_INGESTER_URL:
-                with requests.get(
+                with safe_requests.get(
                     url=f"{settings.RECORDINGS_INGESTER_URL}/api/projects/{self.team.pk}/session_recordings/{str(recording.session_id)}/snapshots",
                     stream=True,
                 ) as r:
@@ -468,7 +468,7 @@ class SessionRecordingViewSet(TeamAndOrgViewSetMixin, viewsets.GenericViewSet):
                 event_properties,
             )
 
-            with requests.get(url=url, stream=True) as r:
+            with safe_requests.get(url=url, stream=True) as r:
                 r.raise_for_status()
                 response = HttpResponse(content=r.raw, content_type="application/json")
                 response["Content-Disposition"] = "inline"

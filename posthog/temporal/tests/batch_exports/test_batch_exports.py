@@ -3,7 +3,6 @@ import datetime as dt
 import io
 import json
 import operator
-from random import randint
 
 import pytest
 from django.test import override_settings
@@ -16,13 +15,14 @@ from posthog.temporal.batch_exports.batch_exports import (
     json_dumps_bytes,
 )
 from posthog.temporal.tests.utils.events import generate_test_events_in_clickhouse
+import secrets
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.django_db]
 
 
 async def test_get_rows_count(clickhouse_client):
     """Test the count of rows returned by get_rows_count."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
 
@@ -45,7 +45,7 @@ async def test_get_rows_count(clickhouse_client):
 
 async def test_get_rows_count_handles_duplicates(clickhouse_client):
     """Test the count of rows returned by get_rows_count are de-duplicated."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
 
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
@@ -69,7 +69,7 @@ async def test_get_rows_count_handles_duplicates(clickhouse_client):
 
 async def test_get_rows_count_can_exclude_events(clickhouse_client):
     """Test the count of rows returned by get_rows_count can exclude events."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
 
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
@@ -99,7 +99,7 @@ async def test_get_rows_count_can_exclude_events(clickhouse_client):
 
 async def test_get_rows_count_can_include_events(clickhouse_client):
     """Test the count of rows returned by get_rows_count can include events."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
 
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
@@ -129,7 +129,7 @@ async def test_get_rows_count_can_include_events(clickhouse_client):
 
 async def test_get_rows_count_ignores_timestamp_predicates(clickhouse_client):
     """Test the count of rows returned by get_rows_count can ignore timestamp predicates."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
 
     inserted_at = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
     data_interval_end = inserted_at + dt.timedelta(hours=1)
@@ -204,7 +204,7 @@ def assert_records_match_events(records, events):
 
 async def test_iter_records(clickhouse_client):
     """Test the rows returned by iter_records."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
 
@@ -236,7 +236,7 @@ async def test_iter_records(clickhouse_client):
 
 async def test_iter_records_handles_duplicates(clickhouse_client):
     """Test the rows returned by iter_records are de-duplicated."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
 
@@ -268,7 +268,7 @@ async def test_iter_records_handles_duplicates(clickhouse_client):
 
 async def test_iter_records_can_exclude_events(clickhouse_client):
     """Test the rows returned by iter_records can exclude events."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
 
@@ -303,7 +303,7 @@ async def test_iter_records_can_exclude_events(clickhouse_client):
 
 async def test_iter_records_can_include_events(clickhouse_client):
     """Test the rows returned by iter_records can include events."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
 
@@ -338,7 +338,7 @@ async def test_iter_records_can_include_events(clickhouse_client):
 
 async def test_iter_records_ignores_timestamp_predicates(clickhouse_client):
     """Test the rows returned by iter_records ignores timestamp predicates when configured."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
 
     inserted_at = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
     data_interval_end = inserted_at + dt.timedelta(hours=1)
@@ -400,7 +400,7 @@ async def test_iter_records_ignores_timestamp_predicates(clickhouse_client):
 )
 async def test_iter_records_with_single_field_and_alias(clickhouse_client, field):
     """Test iter_records can return a single aliased field."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
 
@@ -448,7 +448,7 @@ async def test_iter_records_with_single_field_and_alias(clickhouse_client, field
 
 async def test_iter_records_can_flatten_properties(clickhouse_client):
     """Test iter_records can flatten properties as indicated by a field expression."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
 
@@ -495,7 +495,7 @@ async def test_iter_records_can_flatten_properties(clickhouse_client):
 
 async def test_iter_records_uses_extra_query_parameters(clickhouse_client):
     """Test iter_records can flatten properties as indicated by a field expression."""
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
     data_interval_end = dt.datetime.fromisoformat("2023-04-25T14:31:00.000000+00:00")
     data_interval_start = dt.datetime.fromisoformat("2023-04-25T14:30:00.000000+00:00")
 

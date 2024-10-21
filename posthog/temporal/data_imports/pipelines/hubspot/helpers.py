@@ -70,7 +70,7 @@ def fetch_property_history(
     params["propertiesWithHistory"] = props
     params["limit"] = 50
     # Make the API request
-    r = requests.get(url, headers=headers, params=params)
+    r = requests.get(url, headers=headers, params=params, timeout=60)
     # Parse the API response and yield the properties of each result
 
     # Parse the response JSON data
@@ -84,7 +84,7 @@ def fetch_property_history(
         if _next:
             next_url = _next["link"]
             # Get the next page response
-            r = requests.get(next_url, headers=headers)
+            r = requests.get(next_url, headers=headers, timeout=60)
             _data = r.json()
         else:
             _data = None
@@ -125,13 +125,13 @@ def fetch_data(
 
     # Make the API request
     try:
-        r = requests.get(url, headers=headers, params=params)
+        r = requests.get(url, headers=headers, params=params, timeout=60)
     except http_requests.exceptions.HTTPError as e:
         if e.response.status_code == 401:
             # refresh token
             api_key = refresh_access_token(refresh_token)
             headers = _get_headers(api_key)
-            r = requests.get(url, headers=headers, params=params)
+            r = requests.get(url, headers=headers, params=params, timeout=60)
         else:
             raise e
     # Parse the API response and yield the properties of each result
@@ -170,7 +170,7 @@ def fetch_data(
         if _next:
             next_url = _next["link"]
             # Get the next page response
-            r = requests.get(next_url, headers=headers)
+            r = requests.get(next_url, headers=headers, timeout=60)
             _data = r.json()
         else:
             _data = None

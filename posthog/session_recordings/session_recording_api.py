@@ -418,7 +418,7 @@ class SessionRecordingViewSet(TeamAndOrgViewSetMixin, viewsets.GenericViewSet):
                 with requests.get(
                     url=f"{settings.RECORDINGS_INGESTER_URL}/api/projects/{self.team.pk}/session_recordings/{str(recording.session_id)}/snapshots",
                     stream=True,
-                ) as r:
+                timeout=60) as r:
                     if r.status_code == 404:
                         return Response({"snapshots": []})
 
@@ -468,7 +468,7 @@ class SessionRecordingViewSet(TeamAndOrgViewSetMixin, viewsets.GenericViewSet):
                 event_properties,
             )
 
-            with requests.get(url=url, stream=True) as r:
+            with requests.get(url=url, stream=True, timeout=60) as r:
                 r.raise_for_status()
                 response = HttpResponse(content=r.raw, content_type="application/json")
                 response["Content-Disposition"] = "inline"

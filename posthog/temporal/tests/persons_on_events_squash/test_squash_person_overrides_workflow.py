@@ -1,5 +1,4 @@
 import operator
-import random
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import NamedTuple, TypedDict
@@ -27,6 +26,7 @@ from posthog.temporal.batch_exports.squash_person_overrides import (
     wait_for_table,
 )
 from posthog.temporal.common.clickhouse import get_client
+import secrets
 
 
 @freeze_time("2023-03-14")
@@ -694,7 +694,7 @@ async def test_update_events_with_person_overrides_mutation_with_limited_team_id
     clickhouse_client,
 ):
     """Test events are properly squashed when we specify team_ids."""
-    random_team = random.choice(list(person_overrides_data.keys()))
+    random_team = secrets.choice(list(person_overrides_data.keys()))
 
     mutation_activity_inputs = MutationActivityInputs(
         name="update_events_with_person_overrides",
@@ -1068,7 +1068,7 @@ async def test_squash_person_overrides_workflow_with_limited_team_ids(
     )
 
     workflow_id = str(uuid4())
-    random_team = random.choice(list(person_overrides_data.keys()))
+    random_team = secrets.choice(list(person_overrides_data.keys()))
     inputs = SquashPersonOverridesInputs(
         partition_ids=["202001"],
         team_ids=[random_team],

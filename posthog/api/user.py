@@ -489,7 +489,7 @@ def redirect_to_website(request):
                 "lastName": request.user.last_name,
             },
             headers={"Content-Type": "application/json"},
-        )
+        timeout=60)
 
         if response.status_code == 200:
             json_data = response.json()
@@ -536,7 +536,7 @@ def test_slack_webhook(request):
     try:
         if not settings.DEBUG:
             raise_if_user_provided_url_unsafe(webhook)
-        response = requests.post(webhook, verify=False, json=message)
+        response = requests.post(webhook, verify=False, json=message, timeout=60)
 
         if response.ok:
             return JsonResponse({"success": True})

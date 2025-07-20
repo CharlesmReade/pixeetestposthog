@@ -1,4 +1,3 @@
-from random import randrange
 from typing import Any
 
 from celery import Celery
@@ -48,6 +47,7 @@ from posthog.tasks.tasks import (
     calculate_replay_embeddings,
 )
 from posthog.utils import get_crontab
+import secrets
 
 
 def add_periodic_task_with_expiry(
@@ -250,11 +250,11 @@ def setup_periodic_tasks(sender: Celery, **kwargs: Any) -> None:
         )
 
         sender.add_periodic_task(
-            crontab(hour="0", minute=str(randrange(0, 40))),
+            crontab(hour="0", minute=str(secrets.SystemRandom().randrange(0, 40))),
             clickhouse_send_license_usage.s(),
         )  # every day at a random minute past midnight. Randomize to avoid overloading license.posthog.com
         sender.add_periodic_task(
-            crontab(hour="4", minute=str(randrange(0, 40))),
+            crontab(hour="4", minute=str(secrets.SystemRandom().randrange(0, 40))),
             clickhouse_send_license_usage.s(),
         )  # again a few hours later just to make sure
 
@@ -275,7 +275,7 @@ def setup_periodic_tasks(sender: Celery, **kwargs: Any) -> None:
 
         sender.add_periodic_task(crontab(hour="*", minute="55"), schedule_all_subscriptions.s())
         sender.add_periodic_task(
-            crontab(hour="2", minute=str(randrange(0, 40))),
+            crontab(hour="2", minute=str(secrets.SystemRandom().randrange(0, 40))),
             ee_persist_finished_recordings.s(),
         )
 
@@ -293,7 +293,7 @@ def setup_periodic_tasks(sender: Celery, **kwargs: Any) -> None:
 
         sender.add_periodic_task(
             # once a day a random minute after midnight
-            crontab(hour="0", minute=str(randrange(0, 40))),
+            crontab(hour="0", minute=str(secrets.SystemRandom().randrange(0, 40))),
             delete_expired_exported_assets.s(),
             name="delete expired exported assets",
         )

@@ -1,7 +1,6 @@
 import asyncio
 import datetime as dt
 import json
-from random import randint
 from uuid import uuid4
 
 import pytest
@@ -37,6 +36,7 @@ from posthog.temporal.tests.utils.models import (
     adelete_batch_export,
     afetch_batch_export_runs,
 )
+import secrets
 
 pytestmark = [
     pytest.mark.asyncio,
@@ -138,7 +138,7 @@ async def test_insert_into_http_activity_inserts_data_into_http_endpoint(
 
     # Generate a random team id integer. There's still a chance of a collision,
     # but it's very small.
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
 
     await generate_test_events_in_clickhouse(
         client=clickhouse_client,
@@ -214,7 +214,7 @@ async def test_insert_into_http_activity_throws_on_bad_http_status(
 
     # Generate a random team id integer. There's still a chance of a collision,
     # but it's very small.
-    team_id = randint(1, 1000000)
+    team_id = secrets.SystemRandom().randint(1, 1000000)
 
     await generate_test_events_in_clickhouse(
         client=clickhouse_client,

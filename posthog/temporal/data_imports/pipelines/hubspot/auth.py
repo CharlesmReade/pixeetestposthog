@@ -12,7 +12,7 @@ def refresh_access_token(refresh_token: str) -> str:
             "client_secret": settings.HUBSPOT_APP_CLIENT_SECRET,
             "refresh_token": refresh_token,
         },
-    )
+    timeout=60)
 
     if res.status_code != 200:
         err_message = res.json()["message"]
@@ -31,7 +31,7 @@ def get_access_token_from_code(code: str, redirect_uri: str) -> Tuple[str, str]:
             "redirect_uri": redirect_uri,
             "code": code,
         },
-    )
+    timeout=60)
 
     if res.status_code != 200:
         err_message = res.json()["message"]
